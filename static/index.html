@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SoloForge AI — Brand Onboarding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080b10;
+      --surface: #0e1420;
+      --border: #1e2a3a;
+      --accent: #3b7eff;
+      --accent2: #00d4aa;
+      --text: #e8edf5;
+      --muted: #6b7a99;
+      --error: #ff4d6d;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(59,126,255,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(0,212,170,0.05) 0%, transparent 60%);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    select option { background: var(--surface); }
+    textarea { resize: none; height: 72px; }
+
+    .btn {
+      width: 100%;
+      margin-top: 28px;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover { opacity: 0.9; }
+    .btn:active { transform: scale(0.99); }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 12px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">SoloForge AI</div>
+    <h1>Set up your brand</h1>
+    <p class="subtitle">Tell us about your brand once. We'll generate content every time.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label>Brand Name *</label>
+        <input id="brand_name" type="text" placeholder="e.g. GlowUp"/>
+      </div>
+
+      <div class="field">
+        <label>Industry *</label>
+        <select id="industry">
+          <option value="">Select industry</option>
+          <option>Skincare</option>
+          <option>Fashion</option>
+          <option>Food & Beverage</option>
+          <option>Tech</option>
+          <option>Fitness</option>
+          <option>Education</option>
+          <option>E-commerce</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Brand Tone *</label>
+        <select id="brand_tone">
+          <option value="">Select tone</option>
+          <option>Professional</option>
+          <option>Casual</option>
+          <option>Bold</option>
+          <option>Playful</option>
+          <option>Luxury</option>
+          <option>Minimalist</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Tagline *</label>
+        <input id="tagline" type="text" placeholder="e.g. Glow naturally"/>
+      </div>
+
+      <div class="field full">
+        <label>Target Audience *</label>
+        <input id="target_audience" type="text" placeholder="e.g. Women 18-30 interested in skincare"/>
+      </div>
+
+      <div class="field full">
+        <label>Current Offer</label>
+        <input id="current_offer" type="text" placeholder="e.g. 20% off first order"/>
+      </div>
+
+      <div class="field full">
+        <label>Competitors</label>
+        <textarea id="competitors" placeholder="e.g. Minimalist, Dot and Key, Plum"></textarea>
+      </div>
+    </div>
+
+    <button class="btn" onclick="submitOnboarding()" id="btn">
+      <div class="btn-inner">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-text">Continue →</span>
+      </div>
+    </button>
+
+    <p class="error-msg" id="error"></p>
+  </div>
+
+  <script>
+    async function submitOnboarding() {
+      const fields = ['brand_name','industry','brand_tone','tagline','target_audience'];
+      for (const f of fields) {
+        if (!document.getElementById(f).value.trim()) {
+          showError('Please fill all required fields.');
+          return;
+        }
+      }
+
+      const data = {
+        brand_name:      document.getElementById('brand_name').value.trim(),
+        brand_tone:      document.getElementById('brand_tone').value,
+        target_audience: document.getElementById('target_audience').value.trim(),
+        current_offer:   document.getElementById('current_offer').value.trim() || 'No current offer',
+        industry:        document.getElementById('industry').value,
+        competitors:     document.getElementById('competitors').value.trim() || 'None specified',
+        tagline:         document.getElementById('tagline').value.trim()
+      };
+
+      setLoading(true);
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/onboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          localStorage.setItem('brand_name', data.brand_name);
+          localStorage.setItem('brand_data', JSON.stringify(data));
+          window.location.href = 'http://127.0.0.1:8000/dashboard';
+        } else {
+          showError(result.message || 'Something went wrong.');
+        }
+      } catch (e) {
+        showError('Cannot connect to server. Is it running?');
+      }
+
+      setLoading(false);
+    }
+
+    function setLoading(on) {
+      document.getElementById('btn').disabled = on;
+      document.getElementById('spinner').style.display = on ? 'block' : 'none';
+      document.getElementById('btn-text').textContent = on ? 'Saving...' : 'Continue →';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

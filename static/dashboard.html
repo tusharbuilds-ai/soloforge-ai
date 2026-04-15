@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SoloForge AI — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080b10;
+      --surface: #0e1420;
+      --surface2: #131d2e;
+      --border: #1e2a3a;
+      --accent: #3b7eff;
+      --accent2: #00d4aa;
+      --text: #e8edf5;
+      --muted: #6b7a99;
+      --success: #00d4aa;
+      --error: #ff4d6d;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 10% 10%, rgba(59,126,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 90% 90%, rgba(0,212,170,0.04) 0%, transparent 60%);
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    .brand-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .brand-badge span { color: var(--text); font-weight: 500; }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* ── QUERY BOX ── */
+    .query-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .query-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .query-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .query-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    textarea#query {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 12px 14px;
+      outline: none;
+      resize: none;
+      height: 80px;
+      transition: border-color 0.2s;
+    }
+
+    textarea#query:focus { border-color: var(--accent); }
+    textarea#query::placeholder { color: var(--muted); }
+
+    .generate-btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 80px;
+    }
+
+    .generate-btn:hover { opacity: 0.9; }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── LOADER ── */
+    #loader {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .loader-ring {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loader-text {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .loader-steps {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .step {
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .step.active { opacity: 1; color: var(--accent2); }
+
+    /* ── RESULTS ── */
+    #results { display: none; }
+
+    .score-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .score-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent2);
+    }
+
+    .score-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* Results grid */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* Captions */
+    .captions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .caption-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .caption-item:hover { border-color: var(--accent); }
+    .caption-item.selected { border-color: var(--accent2); background: rgba(0,212,170,0.05); }
+
+    .copy-hint {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Image */
+    #product_image {
+      width: 100%;
+      border-radius: 10px;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: var(--bg);
+      display: block;
+    }
+
+    .img-prompt {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* Market insights */
+    .insights-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .insights-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    /* Action buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-approve {
+      flex: 1;
+      padding: 14px;
+      background: linear-gradient(135deg, #00d4aa, #00a884);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-approve:hover { opacity: 0.9; }
+
+    .btn-regen {
+      flex: 1;
+      padding: 14px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .btn-regen:hover { border-color: var(--accent); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 14px;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Error */
+    .error-banner {
+      background: rgba(255,77,109,0.1);
+      border: 1px solid var(--error);
+      border-radius: 10px;
+      padding: 14px 20px;
+      color: var(--error);
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">SoloForge AI</div>
+    <div class="brand-badge">Brand: <span id="brand-display">—</span></div>
+  </header>
+
+  <main>
+
+    <!-- Query Section -->
+    <div class="query-section">
+      <div class="query-label">What do you need today?</div>
+      <div class="query-row">
+        <textarea id="query" placeholder="e.g. Create Instagram captions and image for our summer sale launch..."></textarea>
+        <button class="generate-btn" onclick="generateContent()" id="gen-btn">
+          <div class="spinner" id="spinner"></div>
+          <span id="gen-text">Generate ✦</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-banner" id="error-banner"></div>
+
+    <!-- Loader -->
+    <div id="loader">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Your AI team is working...</div>
+      <div class="loader-steps">
+        <div class="step" id="s1">📊 Researching market trends</div>
+        <div class="step" id="s2">✍️ Crafting captions</div>
+        <div class="step" id="s3">🖼️ Generating product image</div>
+        <div class="step" id="s4">🔍 Quality checking</div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results">
+
+      <!-- Score -->
+      <div class="score-bar">
+        <div class="score-label">Quality Score</div>
+        <div class="score-value" id="score-val">—</div>
+        <div class="score-track">
+          <div class="score-fill" id="score-fill" style="width:0%"></div>
+        </div>
+        <div class="score-label">/10</div>
+      </div>
+
+      <!-- Captions + Image -->
+      <div class="results-grid">
+
+        <div class="result-card">
+          <div class="result-card-label">✍️ Captions — click to copy</div>
+          <div class="captions-list" id="captions-list"></div>
+          <div class="copy-hint">Click any caption to copy to clipboard</div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-card-label">🖼️ Product Image</div>
+          <img id="product_image" src="" alt="Generated product image"/>
+          <div class="img-prompt" id="img-prompt"></div>
+        </div>
+
+      </div>
+
+      <!-- Market Insights (collapsible) -->
+      <details class="insights-card" style="margin-bottom:20px;">
+        <summary style="cursor:pointer; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">
+          📊 Market Insights
+        </summary>
+        <div class="insights-text" id="market-insights"></div>
+      </details>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn-approve" onclick="approve()">✅ Approve & Save</button>
+        <button class="btn-regen" onclick="regenerate()">🔄 Regenerate</button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── State ──
+    let currentResult = null;
+    const brandName = localStorage.getItem('brand_name');
+
+    // Show brand name
+    if (brandName) {
+      document.getElementById('brand-display').textContent = brandName;
+    } else {
+      window.location.href = '/';
+    }
+
+    // ── Loader steps animation ──
+    let stepInterval = null;
+
+    function startSteps() {
+      const steps = ['s1','s2','s3','s4'];
+      let i = 0;
+      steps.forEach(s => document.getElementById(s).classList.remove('active'));
+      stepInterval = setInterval(() => {
+        if (i < steps.length) {
+          document.getElementById(steps[i]).classList.add('active');
+          i++;
+        }
+      }, 2000);
+    }
+
+    function stopSteps() {
+      clearInterval(stepInterval);
+    }
+
+    // ── Generate ──
+    async function generateContent() {
+      const query = document.getElementById('query').value.trim();
+      if (!query) { showError('Please describe what you need.'); return; }
+
+      hideError();
+      setLoading(true);
+      document.getElementById('loader').style.display = 'block';
+      document.getElementById('results').style.display = 'none';
+      startSteps();
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand_name: brandName,
+            user_query: query
+          })
+        });
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          currentResult = result;
+          showResults(result);
+        } else {
+          showError(result.message || 'Generation failed.');
+        }
+
+      } catch(e) {
+        showError('Cannot connect to server.');
+      }
+
+      stopSteps();
+      document.getElementById('loader').style.display = 'none';
+      setLoading(false);
+    }
+
+    // ── Show Results ──
+    function showResults(result) {
+      // Score
+      const score = result.critic_score || 0;
+      document.getElementById('score-val').textContent = score;
+      setTimeout(() => {
+        document.getElementById('score-fill').style.width = (score * 10) + '%';
+      }, 100);
+
+      // Captions — split by numbered lines
+      const captionsList = document.getElementById('captions-list');
+      captionsList.innerHTML = '';
+      const rawCaptions = result.captions || '';
+      const lines = rawCaptions.split('\n').filter(l => l.trim());
+
+      lines.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'caption-item';
+        div.textContent = line.trim();
+        div.onclick = () => {
+          navigator.clipboard.writeText(line.trim());
+          div.classList.add('selected');
+          showToast('Caption copied!');
+          setTimeout(() => div.classList.remove('selected'), 2000);
+        };
+        captionsList.appendChild(div);
+      });
+
+      // Image
+      if (result.image_url) {
+        document.getElementById('product_image').src = result.image_url;
+      }
+
+      // Market insights
+      document.getElementById('market-insights').textContent = result.market_insights || '';
+
+      document.getElementById('results').style.display = 'block';
+    }
+
+    // ── Approve ──
+    async function approve() {
+      if (!currentResult) return;
+
+      try {
+        const res = await fetch('/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand_name: brandName,
+            decision: 'yes',
+            captions: currentResult.captions,
+            image_url: currentResult.image_url,
+            market_insights: currentResult.market_insights,
+            critic_score: currentResult.critic_score
+          })
+        });
+
+        const result = await res.json();
+        showToast('✅ Content saved successfully!');
+
+      } catch(e) {
+        showError('Could not save. Try again.');
+      }
+    }
+
+    // ── Regenerate ──
+    function regenerate() {
+      document.getElementById('results').style.display = 'none';
+      generateContent();
+    }
+
+    // ── Helpers ──
+    function setLoading(on) {
+      document.getElementById('gen-btn').disabled = on;
+      document.getElementById('spinner').style.display = on ? 'block' : 'none';
+      document.getElementById('gen-text').textContent = on ? 'Working...' : 'Generate ✦';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-banner');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('error-banner').style.display = 'none';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
