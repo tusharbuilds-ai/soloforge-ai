@@ -294,7 +294,7 @@
         if (result.status === 'success') {
           localStorage.setItem('brand_name', data.brand_name);
           localStorage.setItem('brand_data', JSON.stringify(data));
-          window.location.href = 'http://127.0.0.1:8000/dashboard';
+          window.location.href = '/dashboard';
         } else {
           showError(result.message || 'Something went wrong.');
         }
