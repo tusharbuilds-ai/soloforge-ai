@@ -224,3 +224,8 @@ def history(brand_name: str):
         return {"status": "success", "history": brand_history}
     except FileNotFoundError:
         return {"status": "success", "history": []}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT",8000))
+    uvicorn.run(app,host="0.0.0.0",port=port)
