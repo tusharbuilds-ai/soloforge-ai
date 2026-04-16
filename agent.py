@@ -102,7 +102,7 @@ Rules:
     print(f"   Intent detected: {intent}")
 
     result = {
-        "brand_context": brand_context,
+        "brand_context": str(brand_context),
         "need_content": False,
         "need_image": False,
         "need_both": False,
@@ -150,7 +150,7 @@ Keep response under 300 words. Plain text only."""),
 HumanMessage(content=F"Rsearch the market for this request")
     ])
 
-    insights = get_text(response)
+    insights =  str(get_text(response))
     print(f"   Market insights ready: {safe(insights, 80)}...")
 
     return {"market_insights": insights}
@@ -200,7 +200,7 @@ RULES:
         HumanMessage(content=safe(state.get("user_query"), 200))
     ])
 
-    captions = get_text(response)
+    captions = str(get_text(response))
     print(f"   Captions ready: {safe(captions, 80)}...")
 
     return {"captions": captions}
@@ -250,7 +250,7 @@ def content_critic_node(state: SoloForgeState) -> dict:
         # avoids any dict/type issues
     ])
 
-    content = get_text(response)
+    content = str(get_text(response))
     print(f"   Critic output: {safe(content, 100)}...")
 
     verdict_match = re.search(r'VERDICT:\s*(APPROVE|REVISE)', content.upper())
@@ -284,7 +284,7 @@ def revision_node(state: SoloForgeState) -> dict:
         "revision_needed": False,
         "market_insights": "",
         "captions": "",
-        "brand_context": updated_context,
+        "brand_context": str(updated_context),
         "revision_count": revision_count,
     }
 
@@ -351,8 +351,8 @@ Caption context: {safe(captions, 150)}""")
     print(f"   Image URL ready ✅")
 
     return {
-        "image_url": base_url,
-        "image_prompt": image_prompt
+        "image_url": str(base_url),
+        "image_prompt": str(image_prompt)
     }
 
 # ════════════════════════════════
