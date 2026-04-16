@@ -15,13 +15,18 @@ load_dotenv()
 
 def get_text(response) -> str:
     """Safely extract text from LLM response regardless of format"""
-    content = response.content
-    if isinstance(content, list):
-        first = content[0]
-        if isinstance(first, dict):
-            return first.get("text", "")
-        return str(first)
-    return str(content)
+    try:
+        content = response.content
+        if isinstance(content, str):
+            return content.strip()
+        if isinstance(content, list) and len(content)>0:
+                first = content[0]
+                if isinstance(first,dict):
+                    return first.get("text","").strip()
+                return str(first).strip()
+        return str(content).strip()
+    except:
+        return ""
 
 def safe(value, length: int = 200) -> str:
     """Safely convert any value to string and slice"""
